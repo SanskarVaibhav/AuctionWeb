@@ -5,15 +5,18 @@ const { io } = require('../server');
 exports.createAuction = async (req, res) => {
   try {
     const { title, description, startingBid, endTime, images, category } = req.body;
-    
+
     const auction = new Auction({
       title,
       description,
       startingBid,
+      currentBid: startingBid, // Ensure currentBid is initialized
       endTime,
       images,
       category,
-      seller: req.user.id
+      seller: req.user.id,
+      status: 'active', // Ensure status is set
+      bids: [] // Ensure bids array is initialized
     });
 
     await auction.save();
@@ -29,18 +32,24 @@ exports.placeBid = async (req, res) => {
     const auction = await Auction.findById(req.params.id);
     if (!auction) return res.status(404).json({ error: 'Auction not found' });
 
-    if (auction.status !== 'active') {
+    // Check if auction has ended
+    if (auction.status !== 'active' || new Date() > new Date(auction.endTime)) {
+      auction.status = 'ended';
+      await auction.save();
       return res.status(400).json({ error: 'Auction has ended' });
     }
 
-    if (req.body.amount <= auction.currentBid) {
+    // Validate bid amount
+    if (typeof req.body.amount !== 'number' || req.body.amount <= auction.currentBid) {
       return res.status(400).json({ error: 'Bid must be higher than current bid' });
     }
 
+    // Add bid
     auction.currentBid = req.body.amount;
     auction.bids.push({
       bidder: req.user.id,
-      amount: req.body.amount
+      amount: req.body.amount,
+      time: new Date()
     });
 
     await auction.save();

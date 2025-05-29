@@ -1,4 +1,5 @@
 import axios from 'axios';
+import io from 'socket.io-client';
 import {
   BID_PLACED,
   BID_ERROR,
@@ -28,7 +29,9 @@ export const placeBid = (auctionId, amount) => async (dispatch, getState) => {
       payload: data
     });
 
-    // Socket.io will handle real-time updates
+    // Optionally, you can emit a socket event here if needed
+    // socket.emit('bidPlaced', data);
+
   } catch (err) {
     dispatch({
       type: BID_ERROR,
@@ -38,13 +41,19 @@ export const placeBid = (auctionId, amount) => async (dispatch, getState) => {
 };
 
 // Setup socket listeners
+let socket;
 export const setupSocketListeners = (dispatch) => {
-  const socket = io(process.env.REACT_APP_API_URL);
+  if (!socket) {
+    socket = io(process.env.REACT_APP_API_URL);
 
-  socket.on('bidUpdate', (data) => {
-    dispatch({
-      type: NEW_BID_RECEIVED,
-      payload: data
+    socket.on('bidUpdate', (data) => {
+      dispatch({
+        type: NEW_BID_RECEIVED,
+        payload: data
+      });
     });
-  });
+  }
 };
+
+// Optional: export socket for use elsewhere if needed
+export { socket };

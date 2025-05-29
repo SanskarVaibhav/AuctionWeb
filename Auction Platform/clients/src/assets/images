@@ -1,0 +1,2 @@
+// If you want to use this as a string template in TypeScript:
+const logoImg = `<img src="assets/images/logo.png" alt="Logo" />`;

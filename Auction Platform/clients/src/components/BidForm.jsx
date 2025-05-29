@@ -7,13 +7,16 @@ const BidForm = ({ auctionId, currentBid }) => {
   const { isAuthenticated } = useSelector(state => state.auth);
   const dispatch = useDispatch();
 
+  const minBid = Number(currentBid) + 1;
+
   const handleSubmit = (e) => {
     e.preventDefault();
     if (!isAuthenticated) return alert('Please login to bid');
-    if (parseFloat(bidAmount) <= currentBid) {
-      return alert('Bid must be higher than current bid');
+    const bidValue = parseFloat(bidAmount);
+    if (isNaN(bidValue) || bidValue < minBid) {
+      return alert(`Bid must be at least $${minBid}`);
     }
-    dispatch(placeBid(auctionId, parseFloat(bidAmount)));
+    dispatch(placeBid(auctionId, bidValue));
     setBidAmount('');
   };
 
@@ -23,12 +26,14 @@ const BidForm = ({ auctionId, currentBid }) => {
         type="number"
         value={bidAmount}
         onChange={(e) => setBidAmount(e.target.value)}
-        min={currentBid + 1}
+        min={minBid}
         step="0.01"
-        placeholder={`Enter bid (min $${currentBid + 1})`}
+        placeholder={`Enter bid (min $${minBid})`}
         required
       />
-      <button type="submit">Place Bid</button>
+      <button type="submit" disabled={!isAuthenticated}>
+        {isAuthenticated ? 'Place Bid' : 'Login to Bid'}
+      </button>
     </form>
   );
 };

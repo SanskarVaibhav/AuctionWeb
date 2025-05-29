@@ -1,0 +1,28 @@
+{
+  "name": "auction-platform-client",
+  "version": "1.0.0",
+  "description": "Client for the Auction Platform web application",
+  "main": "src/index.js",
+  "scripts": {
+    "start": "react-scripts start",
+    "build": "react-scripts build",
+    "test": "react-scripts test",
+    "eject": "react-scripts eject"
+  },
+  "keywords": [
+    "auction",
+    "react",
+    "web"
+  ],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "react": "^18.0.0",
+    "react-dom": "^18.0.0",
+    "react-redux": "^8.0.0",
+    "redux": "^4.2.0"
+  },
+  "devDependencies": {
+    "react-scripts": "^5.0.0"
+  }
+}

@@ -39,7 +39,7 @@ const auctionSchema = new mongoose.Schema({
   }],
   category: { 
     type: String,
-    enum: ['Art', 'Electronics', 'Collectibles', 'Jewelry'],
+    enum: ['Art', 'Electronics', 'Collectibles', 'Jewelry', 'Other'],
     required: true 
   },
   endTime: { 
@@ -54,17 +54,30 @@ const auctionSchema = new mongoose.Schema({
   bids: [bidSchema],
   status: { 
     type: String, 
-    enum: ['active', 'ended', 'sold'],
+    enum: ['active', 'ended', 'sold', 'cancelled'],
     default: 'active' 
   }
 }, { timestamps: true });
 
-// Auto-update status when auction ends
+// Auto-update status when auction ends or is saved
 auctionSchema.pre('save', function(next) {
-  if (this.isModified('endTime') && new Date(this.endTime) < new Date()) {
+  if (this.endTime && new Date(this.endTime) < new Date()) {
     this.status = 'ended';
   }
   next();
 });
+
+// Add a method to place a bid
+auctionSchema.methods.placeBid = function(bidderId, amount) {
+  if (this.status !== 'active') {
+    throw new Error('Auction is not active.');
+  }
+  if (amount <= this.currentBid) {
+    throw new Error('Bid must be higher than current bid.');
+  }
+  this.bids.push({ bidder: bidderId, amount });
+  this.currentBid = amount;
+  return this.save();
+};
 
 module.exports = mongoose.model('Auction', auctionSchema);
