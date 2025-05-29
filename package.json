@@ -1,0 +1,17 @@
+{
+  "name": "auctionweb",
+  "version": "1.0.1",
+  "description": "A web application for online auctions",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "auction",
+    "web",
+    "online"
+  ],
+  "author": "Your Name",
+  "license": "ISC"
+}
